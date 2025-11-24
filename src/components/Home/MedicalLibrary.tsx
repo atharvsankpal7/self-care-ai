@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Sparkles, Stethoscope, Brain } from "lucide-react";
+import { ArrowRight, BookOpen, Stethoscope, Brain } from "lucide-react";
 
 export const MedicalLibrary = () => {
     return (
