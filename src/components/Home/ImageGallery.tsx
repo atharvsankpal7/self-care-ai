@@ -10,8 +10,8 @@ const ImageGallery = () => {
         {/* Main Large Image (Eye Scanning) */}
         <div className="col-span-2 relative h-64 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-900/10 group">
           <img 
-            src="https://images.unsplash.com/photo-1579684385180-1ea55f61d21e?auto=format&fit=crop&w=800&q=80" 
-            alt="AI Eye Scanning" 
+            src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80" 
+            alt="AI Eye Scanning Equipment" 
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/40 to-transparent flex items-center p-8">
@@ -26,8 +26,8 @@ const ImageGallery = () => {
         {/* Bottom Left (Close up Eye) */}
         <div className="col-span-1 h-48 rounded-3xl overflow-hidden shadow-xl shadow-emerald-900/10 relative group mt-4">
            <img 
-            src="https://images.unsplash.com/photo-1563205847-e17f4659f848?auto=format&fit=crop&w=500&q=80" 
-            alt="Human Eye Detail" 
+            src="https://images.unsplash.com/photo-1602573991396-fb69ee6d7a0d?auto=format&fit=crop&w=500&q=80" 
+            alt="Detailed Eye Examination" 
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
            {/* Floating Badge */}
@@ -39,8 +39,8 @@ const ImageGallery = () => {
         {/* Bottom Right (Doctor/Tech) */}
         <div className="col-span-1 h-56 -mt-8 rounded-3xl overflow-hidden shadow-xl shadow-emerald-900/10 relative group z-20 border-4 border-white">
           <img 
-            src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=500&q=80" 
-            alt="Doctor Reviewing" 
+            src="https://images.unsplash.com/photo-1456081101716-74e616ab23d8?auto=format&fit=crop&w=500&q=80" 
+            alt="Medical Professional Eye Examination" 
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-emerald-900/10 group-hover:bg-transparent transition-colors" />
