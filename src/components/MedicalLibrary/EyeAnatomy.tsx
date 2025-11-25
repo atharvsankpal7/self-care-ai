@@ -29,8 +29,8 @@ export const EyeAnatomy = () => {
           </p>
 
           {/* Button */}
-          <button className="know-more-button">
-            Know more..
+          <button className="know-more-button mx-auto">
+            <span>Know more..</span>
           </button>
         </div>
 

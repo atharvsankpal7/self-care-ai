@@ -21,10 +21,10 @@
 
 .know-more-button {
   --fs: 1.25em;
-  --col1: honeydew;
-  --col2: rgba(240, 128, 128, 0.603);
-  --col3: indianred;
-  --col4: maroon;
+  --col1: #f0fdf4; /* honeydew-ish but emerald-50 */
+  --col2: rgba(52, 211, 153, 0.6); /* emerald-400 with opacity */
+  --col3: #059669; /* emerald-600 */
+  --col4: #064e3b; /* emerald-900 */
   --pd: .5em .65em;
   display: grid;
   align-content: baseline;
@@ -78,8 +78,8 @@
   border: 2px solid var(--col4);
   border-radius: 50%;
   transition: all .5s ease-out;
-  height: .1em;
-  width: .1em;
+  height: .25em; /* Increased size */
+  width: .25em;  /* Increased size */
 }
 
 .know-more-button:hover::after {
@@ -89,12 +89,12 @@
 
 .know-more-button::before {
   border-radius: 50% 0%;
-  border: 4px solid var(--col4);
+  border: 4px solid #ffffff; /* Made white */
   box-shadow: inset 1px 1px var(--col2);
   transition: all 1s ease-out;
   transform: rotate(45deg);
-  height: .45em;
-  width: .45em;
+  height: 1em; /* Increased size */
+  width: 1em;  /* Increased size */
 }
 
 .know-more-button:hover::before {
