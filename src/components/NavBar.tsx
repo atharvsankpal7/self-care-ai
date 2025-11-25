@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { Search, User, CalendarCheck, X, Menu } from 'lucide-react';
 import Logo from './Logo';
 
+import { Link, useLocation } from 'react-router-dom';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -13,28 +16,35 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', active: true },
-    { name: 'Medical Library', active: false },
-    { name: 'Dashboard', active: false },
+    { name: 'Home', path: '/' },
+    { name: 'Medical Library', path: '/medical-library' },
+    { name: 'Dashboard', path: '#' },
   ];
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname !== '/') return false;
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         
         {/* Left: Logo */}
-        <Logo />
+        <Link to="/">
+          <Logo />
+        </Link>
 
         {/* Center: Desktop Nav */}
         <div className="hidden md:flex items-center gap-8 bg-white/50 px-6 py-2 rounded-full border border-white/20 shadow-sm backdrop-blur-sm">
           {navLinks.map((link) => (
-            <a 
+            <Link 
               key={link.name} 
-              href="#" 
-              className={`text-sm font-medium transition-colors ${link.active ? 'text-emerald-700 font-bold' : 'text-gray-500 hover:text-emerald-600'}`}
+              to={link.path} 
+              className={`text-sm font-medium transition-colors ${isActive(link.path) ? 'text-emerald-700 font-bold' : 'text-gray-500 hover:text-emerald-600'}`}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -44,12 +54,12 @@ const Navbar = () => {
             <Search size={20} />
           </button>
           <div className="h-4 w-px bg-gray-300"></div>
-          <button className="flex items-center gap-2 text-gray-600 hover:text-emerald-700 font-medium">
+          <Link to="/login" className="flex items-center gap-2 text-gray-600 hover:text-emerald-700 font-medium">
             <span className="text-sm">Login</span>
             <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
               <User size={16} />
             </div>
-          </button>
+          </Link>
           <button className="bg-gray-900 text-white p-2 rounded-lg hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200">
             <CalendarCheck size={18} />
           </button>
@@ -68,13 +78,18 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 p-6 md:hidden flex flex-col gap-4 shadow-xl">
           {navLinks.map((link) => (
-            <a key={link.name} href="#" className="text-lg font-medium text-gray-700 py-2 border-b border-gray-50">
+            <Link 
+              key={link.name} 
+              to={link.path} 
+              className="text-lg font-medium text-gray-700 py-2 border-b border-gray-50"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               {link.name}
-            </a>
+            </Link>
           ))}
-          <button className="w-full bg-emerald-600 text-white py-3 rounded-xl font-medium mt-2">
+          <Link to="/login" className="w-full bg-emerald-600 text-white py-3 rounded-xl font-medium mt-2 text-center" onClick={() => setIsMobileMenuOpen(false)}>
             Patient Login
-          </button>
+          </Link>
         </div>
       )}
     </nav>
