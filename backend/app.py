@@ -3,6 +3,10 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 import os
+# Reduce TensorFlow verbose startup logs and disable oneDNN custom ops.
+# Must set these before TensorFlow is imported to take effect.
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
 import io
 from typing import List, Dict, Tuple
 
@@ -27,7 +31,7 @@ class ModelPredictor:
     model's output ordering.
     """
 
-    def __init__(self, model_path: str = "model_EfficientNetB7.h5"):
+    def __init__(self, model_path: str = "model.h5"):
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at: {model_path}")
         # load model (no compile needed for inference)
@@ -71,7 +75,7 @@ app.add_middleware(
 app.include_router(auth.router)
 
 # instantiate predictor (loads model file from current working dir)
-predictor = ModelPredictor(model_path="model_EfficientNetB7.h5")
+predictor = ModelPredictor(model_path="model.h5")
 
 
 @app.get("/health")
@@ -98,3 +102,11 @@ async def predict(file: UploadFile = File(...), current_user: models.User = Depe
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
 
     return JSONResponse({"predicted_label": label, "probabilities": probabilities})
+
+
+if __name__ == "__main__":
+    # When executed directly, run the FastAPI app with Uvicorn.
+    # This makes `python app.py` behave like `uvicorn app:app`.
+    import uvicorn
+
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info")
