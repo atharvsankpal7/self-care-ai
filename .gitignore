@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-*.h5
-
 # Python
 __pycache__/
 *.py[cod]

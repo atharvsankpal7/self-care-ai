@@ -1,7 +1,7 @@
 # Eye Disease Classification - FastAPI server
 
 This directory adds a small FastAPI server to serve predictions from the trained
-EfficientNetB7 model (`model_EfficientNetB7.h5`). It accepts an image upload,
+EfficientNetB7 model (`model.h5`). It accepts an image upload,
 preprocesses it the same way used for training (EfficientNet `preprocess_input`),
 and returns the predicted class plus probabilities for each class.
 
@@ -21,7 +21,7 @@ Quick start (PowerShell)
 
    pip install -r requirements.txt
 
-3. Place your `model_EfficientNetB7.h5` into this project folder (same level as `app.py`).
+3. Place your `model.h5` into this project folder (same level as `app.py`).
 
 4. If necessary, edit `classes.txt` so each line contains the class name in the exact
    order the model outputs (one name per line).
