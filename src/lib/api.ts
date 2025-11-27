@@ -32,13 +32,29 @@ export const login = async (email: string, password: string) => {
 };
 
 
-export const register = async (email: string, password: string, full_name: string) => {
+export const register = async (
+  email: string, 
+  password: string, 
+  full_name: string,
+  dob: string,
+  gender: string,
+  address: string,
+  profile_image: string | null
+) => {
   const res = await fetch("http://localhost:8000/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password, full_name }),
+    body: JSON.stringify({ 
+      email, 
+      password, 
+      full_name,
+      dob,
+      gender,
+      address,
+      profile_image
+    }),
   });
 
   if (!res.ok) {
@@ -46,6 +62,16 @@ export const register = async (email: string, password: string, full_name: strin
   }
 
   return res.json();
+};
+
+export const getHistory = async () => {
+  const response = await api.get('/history');
+  return response.data;
+};
+
+export const getUserProfile = async () => {
+  const response = await api.get('/users/me');
+  return response.data;
 };
 
 

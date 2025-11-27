@@ -74,6 +74,10 @@ app.add_middleware(
 
 app.include_router(auth.router)
 
+from fastapi.staticfiles import StaticFiles
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+
 # instantiate predictor (loads model file from current working dir)
 predictor = ModelPredictor(model_path="model.h5")
 
@@ -83,8 +87,33 @@ def health():
     return {"status": "ok"}
 
 
+import shutil
+import uuid
+from datetime import datetime
+from pydantic import BaseModel
+from database import get_db
+from sqlalchemy.orm import Session
+
+# ... (existing imports)
+
+class PredictionResponse(BaseModel):
+    id: int
+    label: str
+    confidence: str
+    timestamp: str
+    severity: str
+    image_path: str
+
+@app.get("/users/me", response_model=auth.UserResponse)
+async def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
+    return current_user
+
+@app.get("/history", response_model=List[PredictionResponse])
+async def get_history(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    return db.query(models.Prediction).filter(models.Prediction.user_id == current_user.id).all()
+
 @app.post("/predict")
-async def predict(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user)):
+async def predict(file: UploadFile = File(...), current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     """
     Accepts an image file upload and returns predicted class and probabilities.
     Requires authentication.
@@ -93,15 +122,52 @@ async def predict(file: UploadFile = File(...), current_user: models.User = Depe
     if not content_type.startswith("image"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an image")
 
-    image_bytes = await file.read()
+    # Save image
+    os.makedirs("uploads", exist_ok=True)
+    file_extension = os.path.splitext(file.filename)[1]
+    file_name = f"{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join("uploads", file_name)
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Read for prediction
+    with open(file_path, "rb") as f:
+        image_bytes = f.read()
+
     try:
         label, probabilities = predictor.predict(image_bytes)
+        
+        # Determine severity (mock logic, refine as needed)
+        severity = "High" if label != "normal" else "Low"
+        confidence = f"{probabilities[label]:.2f}"
+
+        # Save prediction
+        prediction = models.Prediction(
+            user_id=current_user.id,
+            image_path=file_path,
+            label=label,
+            confidence=confidence,
+            timestamp=datetime.now().isoformat(),
+            severity=severity
+        )
+        db.add(prediction)
+        db.commit()
+        db.refresh(prediction)
+
     except FileNotFoundError as e:
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
 
-    return JSONResponse({"predicted_label": label, "probabilities": probabilities})
+    return JSONResponse({
+        "predicted_label": label, 
+        "probabilities": probabilities,
+        "severity": severity,
+        "confidence": confidence,
+        "image_path": file_path,
+        "timestamp": prediction.timestamp
+    })
 
 
 if __name__ == "__main__":

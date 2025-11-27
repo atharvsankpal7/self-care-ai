@@ -25,6 +25,10 @@ class UserCreate(BaseModel):
     email: str
     password: str
     full_name: str
+    dob: str
+    gender: str
+    address: str
+    profile_image: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
@@ -33,6 +37,10 @@ class Token(BaseModel):
 class UserResponse(BaseModel):
     email: str
     full_name: str
+    dob: str
+    gender: str
+    address: str
+    profile_image: Optional[str] = None
 
 # Helpers
 def verify_password(plain_password, hashed_password):
@@ -78,11 +86,26 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = get_password_hash(user.password)
-    db_user = User(email=user.email, full_name=user.full_name, hashed_password=hashed_password)
+    db_user = User(
+        email=user.email, 
+        full_name=user.full_name, 
+        hashed_password=hashed_password,
+        dob=user.dob,
+        gender=user.gender,
+        address=user.address,
+        profile_image=user.profile_image
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return UserResponse(email=db_user.email, full_name=db_user.full_name)
+    return UserResponse(
+        email=db_user.email, 
+        full_name=db_user.full_name,
+        dob=db_user.dob,
+        gender=db_user.gender,
+        address=db_user.address,
+        profile_image=db_user.profile_image
+    )
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
