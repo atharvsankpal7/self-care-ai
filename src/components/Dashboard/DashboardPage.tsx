@@ -3,9 +3,9 @@ import { Upload, X, Loader2, FileText, Activity, Calendar, MapPin, User as UserI
 
 import { uploadImage, getUserProfile, getHistory } from '../../lib/api';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { generatePDF } from '../../utils/pdfGenerator';
 
-import logo from '../../assets/logo.png';
+
 import Navbar from '../NavBar';
 
 interface UserProfile {
@@ -88,76 +88,7 @@ export const DashboardPage = () => {
     return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
-  const generatePDF = async (record: HistoryRecord) => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage();
-  const { width } = page.getSize();
 
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-  let y = 750;
-
-  const loggedAt = new Date().toLocaleString();
-  const diagnosisDate = new Date(record.timestamp).toLocaleDateString();
-  const confidence = `${(parseFloat(record.confidence) * 100).toFixed(1)}%`;
-  const diseaseName = record.label.replace("_", " ");
-
-  page.drawText("SelfCare AI Report", {
-    x: 40,
-    y,
-    size: 22,
-    font: titleFont,
-    color: rgb(0.06, 0.73, 0.50)
-  });
-
-  page.drawText(`Generated on: ${loggedAt}`, {
-    x: width - 200,
-    y,
-    size: 10,
-    font,
-    color: rgb(0.4, 0.4, 0.4)
-  });
-
-  y -= 40;
-
-  if (user) {
-    page.drawText(user.full_name, { x: 40, y, size: 14, font });
-    y -= 20;
-    page.drawText(`${user.dob} (${calculateAge(user.dob)}y) | ${user.gender}`, { x: 40, y, size: 11, font, color: rgb(0.3, 0.3, 0.3) });
-    y -= 20;
-    page.drawText(user.address, { x: 40, y, size: 11, font, color: rgb(0.3, 0.3, 0.3) });
-  }
-
-  y -= 40;
-
-  page.drawText("Diagnosis Report", {
-    x: 40,
-    y,
-    size: 18,
-    font: titleFont,
-    color: rgb(0.06, 0.73, 0.50)
-  });
-
-  y -= 30;
-
-  page.drawText(`Date: ${diagnosisDate}`, { x: 40, y, size: 12, font });
-  y -= 18;
-  page.drawText(`Disease Classified: ${diseaseName}`, { x: 40, y, size: 12, font });
-  y -= 18;
-  page.drawText(`Severity: ${record.severity}`, { x: 40, y, size: 12, font });
-  y -= 18;
-  page.drawText(`Confidence: ${confidence}`, { x: 40, y, size: 12, font });
-
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `report_${record.id}.pdf`;
-  a.click();
-  URL.revokeObjectURL(url);
-};
 
   const chartData = [...history]
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
@@ -323,7 +254,7 @@ export const DashboardPage = () => {
                                         <td className="py-4 px-4 text-sm text-slate-600">{(parseFloat(record.confidence) * 100).toFixed(0)}%</td>
                                         <td className="py-4 px-4 text-right">
                                             <button 
-                                                onClick={() => generatePDF(record)}
+                                                onClick={() => generatePDF(record, user)}
                                                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-full transition-colors"
                                             >
                                                 <FileText size={14} /> Download
