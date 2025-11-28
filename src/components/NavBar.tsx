@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Search, User, CalendarCheck, X, Menu } from 'lucide-react';
+import { Search, User, CalendarCheck, X, Menu, LogOut } from 'lucide-react';
 import Logo from './Logo';
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -15,10 +17,20 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('token'));
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/login');
+  };
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Medical Library', path: '/medical-library' },
-    { name: 'Dashboard', path: '#' },
+    { name: 'Dashboard', path: '/dashboard' },
   ];
 
   const isActive = (path: string) => {
@@ -54,12 +66,26 @@ const Navbar = () => {
             <Search size={20} />
           </button>
           <div className="h-4 w-px bg-gray-300"></div>
-          <Link to="/login" className="flex items-center gap-2 text-gray-600 hover:text-emerald-700 font-medium">
-            <span className="text-sm">Login</span>
-            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
-              <User size={16} />
-            </div>
-          </Link>
+          
+          {isLoggedIn ? (
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-gray-600 hover:text-red-600 font-medium"
+            >
+              <span className="text-sm">Logout</span>
+              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                <LogOut size={16} />
+              </div>
+            </button>
+          ) : (
+            <Link to="/login" className="flex items-center gap-2 text-gray-600 hover:text-emerald-700 font-medium">
+              <span className="text-sm">Login</span>
+              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
+                <User size={16} />
+              </div>
+            </Link>
+          )}
+
           <button className="bg-gray-900 text-white p-2 rounded-lg hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200">
             <CalendarCheck size={18} />
           </button>
@@ -87,9 +113,22 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Link to="/login" className="w-full bg-emerald-600 text-white py-3 rounded-xl font-medium mt-2 text-center" onClick={() => setIsMobileMenuOpen(false)}>
-            Patient Login
-          </Link>
+          
+          {isLoggedIn ? (
+            <button 
+              onClick={() => {
+                handleLogout();
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full bg-red-600 text-white py-3 rounded-xl font-medium mt-2 text-center"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login" className="w-full bg-emerald-600 text-white py-3 rounded-xl font-medium mt-2 text-center" onClick={() => setIsMobileMenuOpen(false)}>
+              Patient Login
+            </Link>
+          )}
         </div>
       )}
     </nav>

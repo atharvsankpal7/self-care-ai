@@ -35,3 +35,7 @@ __pycache__/
 
 # Environment Variables
 .env
+
+*.h5
+
+/backend/uploads

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Upload, X, Loader2, LogOut, FileText, Activity, Calendar, MapPin, User as UserIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Upload, X, Loader2, FileText, Activity, Calendar, MapPin, User as UserIcon } from 'lucide-react';
+
 import { uploadImage, getUserProfile, getHistory } from '../../lib/api';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 import logo from '../../assets/logo.png';
+import Navbar from '../NavBar';
 
 interface UserProfile {
   full_name: string;
@@ -33,7 +34,7 @@ export const DashboardPage = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ predicted_label: string; probabilities: Record<string, number>; severity: string; confidence: string } | null>(null);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,10 +78,7 @@ export const DashboardPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+
 
   const calculateAge = (dob: string) => {
     if (!dob) return 'N/A';
@@ -161,28 +159,18 @@ export const DashboardPage = () => {
   URL.revokeObjectURL(url);
 };
 
-  const chartData = history.map(h => ({
-    date: new Date(h.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-    confidence: parseFloat(h.confidence) * 100
-  }));
+  const chartData = [...history]
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    .map(h => ({
+      date: new Date(h.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+      confidence: parseFloat(h.confidence) * 100
+    }));
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="w-8 h-8" />
-            <span className="font-bold text-xl bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">SelfCare AI</span>
-          </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-slate-600 hover:text-red-500 transition-colors font-medium">
-            <LogOut size={18} />
-            <span>Sign out</span>
-          </button>
-        </div>
-      </nav>
+      <Navbar/>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl pt-20 pb-20  mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* User Info Card */}
         {user && (
